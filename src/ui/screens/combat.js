@@ -87,22 +87,31 @@ export function mount(root) {
   field.prepend(backdrop(run.act, g0.w, g0.h));
 
   // ── 기하 ──────────────────────────────────────────────────────────────
+  // 세로형은 위에서부터 띠로 나눈다: 상단 바 · 적 · 가운데 · 캐릭터 · 조작 줄 · 손패
   function geo() {
     const { w: W, h: H, portrait } = stageInfo();
-    const cw = portrait ? 170 : 156;
+    const cw = portrait ? 148 : 156;
     const ch = Math.round(cw * 1.42);
-    const foeBase = portrait ? Math.round(Math.min(H * 0.4, 600)) : 438;
-    const heroBase = portrait ? H - 420 : 438;
+    if (!portrait) {
+      return {
+        W, H, portrait, cw, ch,
+        handCx: W / 2, handY: H - ch / 2 + 34, handMaxW: Math.min(W - 470, 940),
+        playX: W / 2, playY: 282,
+        foeBase: 438, foeL: W * 0.4, foeR: W - 24,
+        heroX: Math.max(170, W * 0.19), heroBase: 438, heroArt: 190,
+      };
+    }
+    const handTop = H - ch - 12;
+    const ctrlTop = handTop - 82;
+    const heroArt = H < 1000 ? 96 : 116;
+    const heroBase = ctrlTop - 72;
+    const foeBase = Math.round(Math.min(Math.max(H * 0.37, 300), 470, heroBase - heroArt - 86));
     return {
       W, H, portrait, cw, ch,
-      handCx: W / 2,
-      handY: portrait ? H - ch / 2 - 14 : H - ch / 2 + 34,
-      handMaxW: portrait ? W - 36 : Math.min(W - 470, 940),
-      playX: W / 2,
-      playY: portrait ? (foeBase + 80 + heroBase - 140) / 2 : 282,
-      foeBase, foeL: portrait ? 16 : W * 0.4, foeR: portrait ? W - 16 : W - 24,
-      heroX: portrait ? 118 : Math.max(170, W * 0.19), heroBase,
-      heroArt: portrait ? 136 : 190,
+      handCx: W / 2, handY: H - ch / 2 - 12, handMaxW: W - 24,
+      playX: W / 2, playY: Math.round((foeBase + 80 + heroBase - heroArt) / 2),
+      foeBase, foeL: 10, foeR: W - 10,
+      heroX: 88, heroBase, heroArt,
     };
   }
 
@@ -340,7 +349,10 @@ export function mount(root) {
     const gap = 26;
     const total = widths.reduce((a, b) => a + b, 0) + gap * Math.max(0, list.length - 1);
     const avail = g.foeR - g.foeL;
-    const sc = Math.min(1, avail / Math.max(1, total));
+    const tallest = Math.max(0, ...list.map((e) => ART[enemyDef(e.id).size ?? 'md']));
+    // 세로형에서 큰 적이 상단 바를 가리지 않도록 높이도 맞춘다(상단 바 100 + 의도 44)
+    const vfit = g.portrait && tallest ? Math.min(1, (g.foeBase - 144) / tallest) : 1;
+    const sc = Math.min(1, avail / Math.max(1, total), vfit);
     let x = g.foeL + (avail - total * sc) / 2;
     list.forEach((e, i) => {
       const w = widths[i] * sc;

@@ -28,8 +28,9 @@ export function fit() {
   else if (FORCED === 'landscape') portrait = false;
   let w, h;
   if (portrait) {
+    // 세로(휴대폰)는 너비 560 — 390px 폭 화면에서 약 0.7배로 그려져 카드 글씨를 읽을 수 있다
     const a = FORCED === 'portrait' ? Math.min(aspect, 0.5) : aspect;
-    w = 720; h = Math.round(clamp(720 / a, 1080, 1600));
+    w = 560; h = Math.round(clamp(560 / a, 860, 1240));
   }
   else { h = 720; w = Math.round(clamp(aspect * 720, 1024, 1560)); }
   const scale = Math.min(vw / w, vh / h);
