@@ -68,6 +68,7 @@ export function mount(root) {
   }, run ? '' : 'primary'));
   items.push(menuItem(t('title.compendium'), '', () => goMenu('compendium')));
   items.push(menuItem(t('title.settings'), '', () => openOverlay('settings')));
+  if (app.debug) items.push(menuItem('Debug · battle', 'a1_imps', () => window.verso?.fight('a1_imps')));
 
   const lp = levelProgress(app.meta.insight ?? 0);
   const metaLine = h('div', { class: 'title-meta' },

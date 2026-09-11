@@ -31,6 +31,13 @@ export function clear(el) {
   while (el.firstChild) el.firstChild.remove();
 }
 
+// 비우고 다시 채운다. null·false 는 건너뛴다(replaceChildren 은 null 을 "null" 글자로 넣어 버린다).
+export function fill(el, ...children) {
+  clear(el);
+  append(el, children);
+  return el;
+}
+
 function setAttrs(el, attrs, isSvg) {
   if (!attrs) return;
   for (const [k, v] of Object.entries(attrs)) {

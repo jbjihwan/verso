@@ -37,7 +37,9 @@ export function defaultSettings() {
 
 export function startApp(stage) {
   app.stage = stage;
-  app.debug = new URLSearchParams(location.search).has('debug');
+  const q = new URLSearchParams(location.search);
+  app.debug = q.has('debug');
+  app.instant = q.has('instant');
   const storage = probeStorage();
   app.store = makeStore(storage);
   const loaded = loadAll(app.store, { defaultSettings: defaultSettings(), defaultMeta: defaultMeta(), validateRun });
@@ -79,9 +81,10 @@ export function render() {
   current = { name, handle: mod.mount(root, app) ?? {} };
 }
 
-export function goMenu(name) {
+export function goMenu(name, arg = null) {
   closeAllOverlays();
   app.menu = name;
+  app.menuArg = arg;
   render();
 }
 
@@ -220,6 +223,7 @@ const reduceMq = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced
 
 // JS 쪽 연출 시간 배율(CSS 의 --spd 와 같은 값)
 export function motionScale() {
+  if (app.instant) return 0;   // 검증용 ?instant=1 — 백그라운드 탭에서도 연출을 기다리지 않는다
   if (reduceMq?.matches) return 0.3;
   return app.settings?.fast ? 0.5 : 1;
 }

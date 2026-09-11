@@ -3,7 +3,7 @@ export default {
   common: {
     back: 'Back', close: 'Close', confirm: 'Confirm', cancel: 'Cancel', skip: 'Skip', proceed: 'Proceed',
     leave: 'Leave', ok: 'OK', continue: 'Continue', upright: 'Upright', reversed: 'Reversed', locked: 'Locked',
-    unknown: '???', gold: '{n} gold', hp: 'HP', done: 'Done', none: 'None',
+    unknown: '???', gold: '{n} gold', hp: 'HP', done: 'Done', none: 'None', take: 'Take', choose: 'Choose',
   },
   title: {
     tagline: 'Every card has two faces.',
@@ -70,7 +70,7 @@ export default {
   },
   shop: {
     title: 'The Curio Merchant', remove: 'Card removal', removeDesc: 'Remove one card from your deck',
-    sold: 'Sold', poor: 'Not enough gold', leave: 'Leave', chooseRemove: 'Choose a card to remove',
+    sold: 'Sold', buy: 'Buy', poor: 'Not enough gold', leave: 'Leave', chooseRemove: 'Choose a card to remove',
     potionsFull: 'Potion slots are full',
   },
   rest: {
@@ -79,7 +79,7 @@ export default {
   },
   treasure: { title: 'A sealed reliquary', open: 'Open', empty: 'Empty' },
   bossRelic: { title: 'Claim a boss relic', skip: 'Take nothing' },
-  event: { continue: 'Continue' },
+  event: { continue: 'Continue', fight: 'Fight' },
   select: {
     remove: 'Choose a card to remove', upgrade: 'Choose a card to refine', duplicate: 'Choose a card to copy',
     transform: 'Choose a card to transform', swap: 'Choose a card to turn over for good',
@@ -107,4 +107,10 @@ export default {
     end: 'Out of energy? End your turn.',
     gotIt: 'Got it',
   },
+  prompt: {
+    pick: 'Choose a card', flip: 'Choose a card to flip', discard: 'Choose a card to discard',
+    vanish: 'Choose a card to vanish', upgrade: 'Choose a card to upgrade', discover: 'Choose a card to add to your hand',
+    retain: 'Choose a card to keep', top: 'Choose a card to put on top of your draw pile',
+  },
+  fx: { blocked: 'Blocked' },
 };

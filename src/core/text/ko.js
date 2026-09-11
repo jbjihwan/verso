@@ -3,7 +3,7 @@ export default {
   common: {
     back: '뒤로', close: '닫기', confirm: '확인', cancel: '취소', skip: '건너뛰기', proceed: '계속',
     leave: '떠나기', ok: '확인', continue: '계속', upright: '정방향', reversed: '역방향', locked: '잠김',
-    unknown: '???', gold: '{n} 골드', hp: '체력', done: '완료', none: '없음',
+    unknown: '???', gold: '{n} 골드', hp: '체력', done: '완료', none: '없음', take: '가져가기', choose: '고르기',
   },
   title: {
     tagline: '모든 카드에는 두 얼굴이 있다.',
@@ -70,7 +70,7 @@ export default {
   },
   shop: {
     title: '골동품 상인', remove: '카드 제거', removeDesc: '덱에서 카드 한 장을 없앱니다',
-    sold: '판매됨', poor: '골드가 부족합니다', leave: '떠나기', chooseRemove: '제거할 카드를 고르세요',
+    sold: '판매됨', buy: '구매', poor: '골드가 부족합니다', leave: '떠나기', chooseRemove: '제거할 카드를 고르세요',
     potionsFull: '물약 칸이 가득 찼습니다',
   },
   rest: {
@@ -79,7 +79,7 @@ export default {
   },
   treasure: { title: '봉인된 성유물함', open: '열기', empty: '비어 있음' },
   bossRelic: { title: '보스 유물을 고르세요', skip: '가져가지 않기' },
-  event: { continue: '계속' },
+  event: { continue: '계속', fight: '싸운다' },
   select: {
     remove: '제거할 카드를 고르세요', upgrade: '정련할 카드를 고르세요', duplicate: '복제할 카드를 고르세요',
     transform: '변환할 카드를 고르세요', swap: '영원히 뒤집어 둘 카드를 고르세요',
@@ -107,4 +107,10 @@ export default {
     end: '에너지를 다 썼다면 턴을 종료하세요.',
     gotIt: '알겠습니다',
   },
+  prompt: {
+    pick: '카드를 고르세요', flip: '뒤집을 카드를 고르세요', discard: '버릴 카드를 고르세요',
+    vanish: '소멸시킬 카드를 고르세요', upgrade: '강화할 카드를 고르세요', discover: '손에 넣을 카드를 고르세요',
+    retain: '남길 카드를 고르세요', top: '뽑을 더미 맨 위에 올릴 카드를 고르세요',
+  },
+  fx: { blocked: '막음' },
 };
