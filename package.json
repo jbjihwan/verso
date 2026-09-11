@@ -1,0 +1,11 @@
+{
+  "name": "verso",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "VERSO — every card has two faces. A tarot roguelite deckbuilder.",
+  "scripts": {
+    "test": "node --test",
+    "dev": "python dev-server.py 8090"
+  }
+}
