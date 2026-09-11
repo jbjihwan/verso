@@ -93,7 +93,7 @@ export default {
   deck: { title: 'Deck', count: '{n} cards', empty: 'No cards here' },
   compendium: {
     title: 'Compendium', cards: 'Cards', relics: 'Relics', fool: 'The Fool', magician: 'The Magician',
-    neutral: 'Colorless', found: '{n} / {m} discovered', sealed: 'Not yet discovered',
+    neutral: 'Shared', found: '{n} / {m} discovered', sealed: 'Not yet discovered', lockedAt: 'Revealed at Arcana {n}',
   },
   card: {
     attack: 'Attack', skill: 'Skill', power: 'Power', curse: 'Curse', status: 'Status',
@@ -101,6 +101,7 @@ export default {
     onFlip: 'On flip', cost: 'Cost', x: 'X',
   },
   tutorial: {
+    title: 'How to read the cards',
     play: 'Tap a card, then tap an enemy — or drag the card onto it.',
     flip: 'Every card has two faces. Playing a card turns it over. Tap ↻ to flip one card for free each turn.',
     intent: 'The sign above each enemy shows what it will do on its turn.',

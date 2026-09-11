@@ -8,6 +8,7 @@ import { icon } from './art/icons.js';
 import { glyph } from './art/glyphs.js';
 import { attachTip } from './tooltip.js';
 import * as fx from './fx.js';
+import { markSeen } from '../core/meta.js';
 
 const ROMAN = ['', 'I', 'II', 'III', 'IV'];
 export const actLabel = (n) => t('top.act', { n: getLang() === 'ko' ? n : ROMAN[n] ?? n });
@@ -68,6 +69,7 @@ export function mountHud(root, _app, opts = {}) {
     relicEls.clear();
     for (const id of run.relics) {
       const r = relicDef(id);
+      markSeen(app.meta, 'relics', id);
       const counter = run.rs?.[id]?.counter;
       const b = h('button', { class: 'relic', 'aria-label': L(r.name) }, glyph(r.art ?? 'star', 'rglyph'),
         counter != null ? h('b', { class: 'num relic-n' }, String(counter)) : null);

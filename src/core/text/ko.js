@@ -93,7 +93,7 @@ export default {
   deck: { title: '덱', count: '{n}장', empty: '카드가 없습니다' },
   compendium: {
     title: '도감', cards: '카드', relics: '유물', fool: '바보', magician: '마법사',
-    neutral: '무색', found: '{n} / {m} 발견', sealed: '아직 발견하지 못했습니다',
+    neutral: '공용', found: '{n} / {m} 발견', sealed: '아직 발견하지 못했습니다', lockedAt: '아르카나 {n}에서 드러남',
   },
   card: {
     attack: '공격', skill: '스킬', power: '파워', curse: '저주', status: '상태이상',
@@ -101,6 +101,7 @@ export default {
     onFlip: '뒤집힐 때', cost: '비용', x: 'X',
   },
   tutorial: {
+    title: '카드 읽는 법',
     play: '카드를 누른 뒤 적을 누르세요. 카드를 적 위로 끌어다 놓아도 됩니다.',
     flip: '모든 카드에는 두 얼굴이 있습니다. 카드를 쓰면 뒤집힙니다. 턴마다 한 장은 ↻ 로 공짜로 뒤집을 수 있습니다.',
     intent: '적 머리 위의 표시는 그 적이 자기 턴에 할 행동입니다.',

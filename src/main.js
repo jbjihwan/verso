@@ -20,9 +20,11 @@ import * as deck from './ui/screens/deck.js';
 import * as inspect from './ui/screens/inspect.js';
 import * as pick from './ui/screens/pick.js';
 import * as potion from './ui/screens/potion.js';
+import * as compendium from './ui/screens/compendium.js';
+import * as tutorial from './ui/screens/tutorial.js';
 
-registerScreens({ title, charselect, map, combat, reward, rest, shop, treasure, event, bossRelic: bossrelic, result });
-registerOverlays({ settings, confirm, deck, inspect, pick, potion });
+registerScreens({ title, charselect, map, combat, reward, rest, shop, treasure, event, bossRelic: bossrelic, result, compendium });
+registerOverlays({ settings, confirm, deck, inspect, pick, potion, tutorial });
 setRunValidator(validateRun);
 
 const stage = document.getElementById('stage');

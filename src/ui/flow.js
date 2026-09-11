@@ -6,12 +6,20 @@ import {
   makeShop, makeEvent, rollRelic, relicPool, gainCard, gainRelic, gainPotion,
 } from '../core/run.js';
 import { startCombat } from '../core/combat.js';
-import { applyRunEnd, lockedContent } from '../core/meta.js';
+import { applyRunEnd, lockedContent, markSeen } from '../core/meta.js';
 
 const randomSeed = () => Math.floor(Math.random() * 2 ** 32).toString(36);
 
+// 도감 기록: 덱과 유물을 "본 것"으로 표시한다
+export function noteRun(run = app.run) {
+  if (!run) return;
+  for (const c of run.deck) markSeen(app.meta, 'cards', c.id);
+  for (const id of run.relics) markSeen(app.meta, 'relics', id);
+}
+
 export function beginRun(char, omen = 0) {
   app.run = newRun({ char, omen, seed: randomSeed(), locks: lockedContent(app.meta) });
+  noteRun();
   persist();
   enterRun();
 }
@@ -68,6 +76,7 @@ export function eventFight() {
 // 결과 화면: 메타 반영은 런마다 정확히 한 번
 export function finishRun() {
   const run = app.run;
+  noteRun(run);
   if (run.result && !run.result.applied) {
     run.result.meta = applyRunEnd(app.meta, run.result);
     run.result.applied = true;

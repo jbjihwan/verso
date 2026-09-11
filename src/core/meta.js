@@ -48,7 +48,7 @@ export function isCharUnlocked(meta, id) {
   return !!meta.unlocked?.[id] || levelOf(meta.insight ?? 0) >= 3;
 }
 
-function unlockLevelOf(kind, def) {
+export function unlockLevelOf(kind, def) {
   if (!def.lock) return 1;
   for (const [lv, u] of Object.entries(UNLOCKS)) {
     if (u.kind === kind && u.lock === def.lock && (kind === 'relic' || u.pool === def.pool)) return Number(lv);
