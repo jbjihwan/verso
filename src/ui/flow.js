@@ -3,7 +3,7 @@
 import { app, persist, goMenu, enterRun, render, setAbandonHandler } from './app.js';
 import {
   newRun, enterNode, afterCombat, leaveRoom, endRun, startEventFight, pickBossRelic,
-  makeShop, makeEvent, rollRelic, relicPool,
+  makeShop, makeEvent, rollRelic, relicPool, gainCard, gainRelic, gainPotion,
 } from '../core/run.js';
 import { startCombat } from '../core/combat.js';
 import { applyRunEnd, lockedContent } from '../core/meta.js';
@@ -115,6 +115,40 @@ export function debugRoom(type) {
   run.screen = type;
   persist();
   enterRun();
+}
+
+// 흐름 확인용: 지금 런의 덱으로 바로 전투
+export function debugBattle(enc = 'a1_imps') {
+  const run = app.run;
+  if (!run) return;
+  run.fight = { kind: 'combat', enc, reward: null };
+  app.fxQueue = startCombat(run, enc);
+  run.screen = 'combat';
+  persist();
+  enterRun();
+}
+
+// 흐름 확인용: 카드·유물·물약 지급
+export function debugGive(...ids) {
+  const run = app.run;
+  if (!run) return;
+  for (const id of ids) gainCard(run, id);
+  persist();
+  render();
+}
+
+export function debugRelic(id) {
+  if (!app.run) return;
+  gainRelic(app.run, id);
+  persist();
+  render();
+}
+
+export function debugPotion(id) {
+  if (!app.run) return;
+  gainPotion(app.run, id);
+  persist();
+  render();
 }
 
 // 흐름 확인용: 지금 전투를 즉시 이긴 것으로 처리한다

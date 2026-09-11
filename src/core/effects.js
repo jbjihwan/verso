@@ -1,9 +1,9 @@
 // 효과 컨텍스트(Ctx) — 카드·유물·물약·적이 전투 상태를 바꾸는 유일한 통로.
 // 모든 변경은 이벤트({ t: ... })로 기록되고, UI 는 그 이벤트를 순서대로 연출한다.
-import { cardDef, faceOf, onFlipVals, makeInst } from './cards.js';
+import { cardDef, faceOf, onFlipVals, makeInst, allCards } from './cards.js';
 import { statusDef } from './statuses.js';
 import { relicDef, enemyDef } from './content.js';
-import { int } from './rng.js';
+import { int, sample } from './rng.js';
 
 export const HAND_MAX = 10;
 export const MAX_ENEMIES = 5;
@@ -495,6 +495,13 @@ export class Ctx {
       kind: spec.from, count, min, options, uid: this.card.uid, fi: this.fi, key,
       target: this.target ? this.ref(this.target) : null, x: this.x, v: this.v, prompt: spec.prompt ?? null,
     };
+  }
+
+  // 발견용 후보: 해당 풀에서 해금된 카드 n 장(중복 없음)
+  discoverOptions(pool, n = 3) {
+    const locked = this.run.locks?.cards ?? [];
+    const cands = allCards().filter((d) => d.pool === pool && ['common', 'uncommon', 'rare'].includes(d.rarity) && !locked.includes(d.id));
+    return sample(this.rng, cands, n).map((d) => d.id);
   }
 
   // ── 적 전용 ───────────────────────────────────────────────────────────

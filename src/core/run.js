@@ -307,7 +307,7 @@ export function restHealAmount(run) {
 }
 
 export function rest(run) {
-  if (!run.rest || run.rest.done) return false;
+  if (!run.rest || run.rest.done || relicSum(run, 'noRest') > 0) return false;
   run.hp = Math.min(run.maxHp, run.hp + restHealAmount(run));
   run.rest.done = 'rest';
   for (const rid of run.relics) relicDef(rid).onRest?.(run);

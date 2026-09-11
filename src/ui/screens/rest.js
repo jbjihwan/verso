@@ -4,6 +4,7 @@ import { app, persist, openOverlay } from '../app.js';
 import { t } from '../../core/i18n.js';
 import { rest, refine, restHealAmount } from '../../core/run.js';
 import { canUpgrade } from '../../core/cards.js';
+import { relicSum } from '../../core/effects.js';
 import { mountHud } from '../hud.js';
 import { glyph } from '../art/glyphs.js';
 import { icon } from '../art/icons.js';
@@ -28,7 +29,7 @@ export function mount(root) {
         ? h('p', { class: 'dim' }, t('rest.done'))
         : h('div', { class: 'choices' },
           choice(icon('candle'), t('rest.rest'), t('rest.restDesc', { n: restHealAmount(run) }),
-            () => { rest(run); persist(); hud.update(); draw(); }),
+            () => { rest(run); persist(); hud.update(); draw(); }, relicSum(run, 'noRest') > 0),
           choice(icon('star4'), t('rest.refine'), up.length ? t('rest.refineDesc') : t('rest.nothing'),
             () => openOverlay('deck', {
               title: t('rest.chooseRefine'), cards: up, preview: 'upgrade', pickLabel: t('rest.refine'),

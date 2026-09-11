@@ -46,6 +46,10 @@ const G = {
   quill: '<path d="M26 78c10-26 26-44 50-56-4 20-16 36-40 44"/><path d="M26 78l14-26"/>',
   dagger: '<path d="M50 16l6 12v30h-12V28z"/><path d="M38 58h24M50 58v14"/><path d="M44 76h12"/>',
   crescent2: '<path d="M38 24a26 26 0 1 0 0 52 20 20 0 0 1 0-52zM62 76a26 26 0 1 0 0-52 20 20 0 0 1 0 52z"/>',
+  bindle: '<path d="M22 80L68 28"/><path d="M60 22c10-7 24 0 22 13-2 13-19 17-27 9-6-6-4-16 5-22z"/><path d="M64 30l6-7"/>',
+  dog: '<path d="M26 74c-4-16 4-30 18-33l8-14 5 13h9c9 0 15 7 15 15v4l-11 4-4 9c-2 7-9 9-15 7-6 7-18 5-25-5z"/><circle cx="60" cy="46" r="3" class="gf"/><path d="M78 58l7 2M40 60l-6 12"/>',
+  curtain: '<path d="M16 22h68M20 22c0 20 8 40 22 58M80 22c0 20-8 40-22 58M42 80h16M30 22v7M50 22v7M70 22v7"/>',
+  rope: '<path d="M12 64c22-10 54-10 76 0"/><circle cx="50" cy="26" r="6"/><path d="M50 32v20M36 42h28M44 52l-4 8M56 52l4 8"/>',
 };
 
 export function glyphMarkup(name) {

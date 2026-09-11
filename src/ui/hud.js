@@ -54,7 +54,11 @@ export function mountHud(root, _app, opts = {}) {
       const b = h('button', {
         class: `pslot${id ? ' full' : ''}`,
         'aria-label': id ? L(potionDef(id).name) : t('top.emptySlot'),
-        onClick: () => { if (id) opts.onPotion?.(slot); },
+        onClick: () => {
+          if (!id) return;
+          if (opts.onPotion) opts.onPotion(slot);
+          else openOverlay('potion', { slot, onChange: update });
+        },
       }, id ? glyph(potionDef(id).art ?? 'drop', 'pglyph') : null);
       if (id) attachTip(b, () => [{ title: L(potionDef(id).name), body: L(potionDef(id).desc, potionDef(id).vals ?? {}) }]);
       potions.append(b);

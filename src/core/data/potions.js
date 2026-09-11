@@ -1,2 +1,35 @@
-// 물약 정의 (Task 5 에서 채운다)
-export const POTIONS = [];
+// 물약 정의. 전투 중 자기 턴에만 쓴다. use(ctx, v): v 는 vals(효능 유물이 있으면 배율 적용).
+const P = (id, rarity, art, target, vals, name, desc, use) => ({ id, rarity, art, target, vals, name, desc, use });
+
+export const POTIONS = [
+  P('firePotion', 'common', 'flame', 'enemy', { dmg: 20 }, { ko: '불꽃 물약', en: 'Fire Potion' },
+    { ko: (v) => `적 하나에게 피해를 ${v.dmg} 줍니다.`, en: (v) => `Deal ${v.dmg} damage to an enemy.` },
+    (c, v) => c.hit(c.target, v.dmg)),
+  P('blockPotion', 'common', 'shield', 'none', { blk: 12 }, { ko: '방패 물약', en: 'Shield Potion' },
+    { ko: (v) => `방어도를 ${v.blk} 얻습니다.`, en: (v) => `Gain ${v.blk} Block.` },
+    (c, v) => c.gainBlock('player', v.blk)),
+  P('swiftPotion', 'common', 'feather', 'none', { n: 3 }, { ko: '날쌘 물약', en: 'Swift Potion' },
+    { ko: (v) => `카드를 ${v.n}장 뽑습니다.`, en: (v) => `Draw ${v.n} cards.` },
+    (c, v) => c.draw(v.n)),
+  P('energyPotion', 'common', 'bolt', 'none', { n: 2 }, { ko: '기운 물약', en: 'Energy Potion' },
+    { ko: (v) => `에너지를 ${v.n} 얻습니다.`, en: (v) => `Gain ${v.n} Energy.` },
+    (c, v) => c.energy(v.n)),
+  P('flipPotion', 'common', 'crescent2', 'none', { n: 3 }, { ko: '뒤집기 물약', en: 'Flip Potion' },
+    { ko: (v) => `뒤집기를 ${v.n}회 얻습니다.`, en: (v) => `Gain ${v.n} Flips.` },
+    (c, v) => c.flips(v.n)),
+  P('venomPotion', 'common', 'drop', 'enemy', { n: 7 }, { ko: '독 물약', en: 'Venom Potion' },
+    { ko: (v) => `적 하나에게 독을 ${v.n} 부여합니다.`, en: (v) => `Apply ${v.n} Venom to an enemy.` },
+    (c, v) => c.apply(c.target, 'venom', v.n)),
+  P('mightPotion', 'uncommon', 'sword', 'none', { n: 2 }, { ko: '힘 물약', en: 'Might Potion' },
+    { ko: (v) => `힘을 ${v.n} 얻습니다.`, en: (v) => `Gain ${v.n} Might.` },
+    (c, v) => c.apply('player', 'might', v.n)),
+  P('weakPotion', 'uncommon', 'thorn', 'none', { n: 3 }, { ko: '시든 물약', en: 'Wilting Potion' },
+    { ko: (v) => `모든 적에게 약화를 ${v.n} 부여합니다.`, en: (v) => `Apply ${v.n} Weak to ALL enemies.` },
+    (c, v) => c.applyAll('weak', v.n)),
+  P('healPotion', 'uncommon', 'heart', 'none', { pct: 20 }, { ko: '회복 물약', en: 'Healing Potion' },
+    { ko: (v) => `최대 체력의 ${v.pct}%만큼 회복합니다.`, en: (v) => `Heal ${v.pct}% of your Max HP.` },
+    (c, v) => c.heal('player', Math.floor((c.player.maxHp * v.pct) / 100))),
+  P('twoFacesElixir', 'rare', 'lemniscate', 'none', { n: 2 }, { ko: '두 얼굴의 영약', en: 'Elixir of Two Faces' },
+    { ko: (v) => `손패의 모든 카드를 뒤집습니다. 카드를 ${v.n}장 뽑고 에너지를 1 얻습니다.`, en: (v) => `Flip every card in your hand. Draw ${v.n} cards and gain 1 Energy.` },
+    (c, v) => { c.flipHand(); c.draw(v.n); c.energy(1); }),
+];
