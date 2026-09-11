@@ -55,12 +55,26 @@ function costHtml(inst, fi, inCombat) {
   return `<span class="c-cost${cls}">${c === 'X' ? 'X' : c}</span>`;
 }
 
+// 글자 양(한글·한자는 폭이 넓어 1.8로 센다)에 따라 카드 글씨를 두 단계로 줄인다
+function textWeight(html) {
+  let w = 0;
+  for (const ch of html.replace(/<[^>]+>/g, '')) {
+    const c = ch.codePointAt(0);
+    const wide = (c >= 0x3130 && c <= 0x318f) || (c >= 0xac00 && c <= 0xd7af) || (c >= 0x4e00 && c <= 0x9fff);
+    w += wide ? 1.8 : 1;
+  }
+  return w;
+}
+
 function halfHtml(inst, fi, dv, inCombat) {
   const f = cardDef(inst.id).faces[fi];
+  const body = faceTextHtml(inst, fi, dv);
+  const w = textWeight(body);
+  const size = w > 84 ? ' xlong' : w > 54 ? ' long' : '';
   return `<div class="half ${fi ? 'b' : 'a'}" data-t="${f.type}">`
     + `<div class="c-head">${costHtml(inst, fi, inCombat)}<span class="c-name">${faceName(inst, fi)}</span>`
     + `<svg class="c-type" viewBox="0 0 24 24" aria-hidden="true">${iconMarkup(TYPE_ICON[f.type] ?? 'star4')}</svg></div>`
-    + `<div class="c-text">${faceTextHtml(inst, fi, dv)}</div></div>`;
+    + `<div class="c-text${size}">${body}</div></div>`;
 }
 
 function artHtml(d) {
@@ -90,7 +104,18 @@ export function refreshCard(el, inst, opts = {}) {
   el.classList.toggle('opt', !!opts.opt);
   el.classList.toggle('picked', !!opts.picked);
   el.classList.toggle('dim', !!opts.dim);
+  el.classList.toggle('stuck', !!inst.stuck);
   el.setAttribute('aria-label', `${L(d.faces[active].name)}${inst.up ? '+' : ''}`);
+}
+
+// 카드 뒷면(도감의 미발견 칸)
+export function cardBack(label = '') {
+  const el = h('div', { class: 'card back' });
+  el.innerHTML = '<div class="card-inner"><svg class="back-art" viewBox="0 0 100 142" aria-hidden="true">'
+    + '<rect class="bk-frame" x="9" y="9" width="82" height="124" rx="6"/><circle class="bk-ring" cx="50" cy="71" r="22"/>'
+    + `<g transform="translate(29 50) scale(0.42)">${glyphMarkup('lemniscate')}</g></svg>`
+    + `<span class="back-label">${escapeHtml(label)}</span></div>`;
+  return el;
 }
 
 // 확대 보기용: 한 면을 똑바로 세운 패널

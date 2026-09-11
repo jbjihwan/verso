@@ -1,5 +1,47 @@
-// 조우 정의. pool: easy(막의 첫 전투들) · normal · elite · boss
+// 조우 정의. pool: easy(막의 첫 전투 3번) · normal · elite · boss
+const E = (id, act, pool, enemies) => ({ id, act, pool, enemies });
+
 export const ENCOUNTERS = [
-  { id: 'a1_imps', act: 1, pool: 'easy', enemies: ['cinderImp', 'cinderImp'] },
-  { id: 'a1_torch', act: 1, pool: 'easy', enemies: ['torchbearer'] },
+  // 1막
+  E('a1_imps', 1, 'easy', ['cinderImp', 'cinderImp']),
+  E('a1_torch', 1, 'easy', ['torchbearer']),
+  E('a1_beetle', 1, 'easy', ['kindleBeetle', 'ashWisp']),
+  E('a1_torchImp', 1, 'normal', ['cinderImp', 'torchbearer']),
+  E('a1_thornWisp', 1, 'normal', ['ashWisp', 'thornling']),
+  E('a1_beetles', 1, 'normal', ['kindleBeetle', 'kindleBeetle']),
+  E('a1_wisps', 1, 'normal', ['ashWisp', 'ashWisp', 'ashWisp']),
+  E('a1_thornImps', 1, 'normal', ['cinderImp', 'thornling', 'cinderImp']),
+  E('a1_torchBeetle', 1, 'normal', ['kindleBeetle', 'torchbearer']),
+  E('a1_knight', 1, 'elite', ['knightWands']),
+  E('a1_queen', 1, 'elite', ['queenWands']),
+  E('a1_chariot', 1, 'boss', ['chariot']),
+  E('a1_hermit', 1, 'boss', ['hermit']),
+  // 2막
+  E('a2_eel', 2, 'easy', ['brineEel']),
+  E('a2_lampreys', 2, 'easy', ['lamprey', 'lamprey']),
+  E('a2_wraith', 2, 'easy', ['tideWraith', 'lamprey']),
+  E('a2_mimic', 2, 'normal', ['chaliceMimic', 'lamprey']),
+  E('a2_eelLamprey', 2, 'normal', ['lamprey', 'brineEel']),
+  E('a2_coralWraith', 2, 'normal', ['tideWraith', 'coralSoldier']),
+  E('a2_corals', 2, 'normal', ['coralSoldier', 'coralSoldier']),
+  E('a2_swarm', 2, 'normal', ['lamprey', 'lamprey', 'lamprey']),
+  E('a2_mimicEel', 2, 'normal', ['brineEel', 'chaliceMimic']),
+  E('a2_knight', 2, 'elite', ['knightCups']),
+  E('a2_queen', 2, 'elite', ['queenCups']),
+  E('a2_hanged', 2, 'boss', ['hangedMan']),
+  E('a2_priestess', 2, 'boss', ['priestess']),
+  // 3막
+  E('a3_dancer', 3, 'easy', ['bladeDancer']),
+  E('a3_hawks', 3, 'easy', ['galeHawk', 'galeHawk']),
+  E('a3_oath', 3, 'easy', ['oathbreaker']),
+  E('a3_golem', 3, 'normal', ['shardGolem']),
+  E('a3_sentry', 3, 'normal', ['mirrorSentry', 'galeHawk']),
+  E('a3_dancerHawk', 3, 'normal', ['galeHawk', 'bladeDancer']),
+  E('a3_oathHawk', 3, 'normal', ['oathbreaker', 'galeHawk']),
+  E('a3_pair', 3, 'normal', ['bladeDancer', 'oathbreaker']),
+  E('a3_golemDancer', 3, 'normal', ['bladeDancer', 'shardGolem']),
+  E('a3_knight', 3, 'elite', ['knightSwords']),
+  E('a3_king', 3, 'elite', ['kingSwords']),
+  E('a3_tower', 3, 'boss', ['tower']),
+  E('a3_justice', 3, 'boss', ['justice']),
 ];

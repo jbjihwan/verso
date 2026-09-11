@@ -155,7 +155,7 @@ export function playCard(run, uid, targetUid) {
 
   const v = valsOf(inst, fi);
   if (cost === 'X') v.x = x + relicSum(run, 'xBonus');
-  f.calc?.(cs, v, inst);
+  f.calc?.(cs, v, inst, target);
   const ctx = new Ctx(run, { events, card: inst, target, fi, v, x: v.x ?? 0 });
   f.play(ctx, v, inst);
   if (!cs.pending) finishPlay(run, ctx, inst, fi);
@@ -172,6 +172,8 @@ function finishPlay(run, ctx, inst, fi) {
     runHooks(c0, 'cardPlayed', inst, f, fi);
     for (const e of cs.enemies) if (!e.dead) enemyDef(e.id).hooks?.cardPlayed?.(c0.as(e), e, inst, f);
   }
+  cs.flags.lastPlayed = inst.uid;
+  cs.flags.lastPlayedTurn = cs.turn;
   if (cs.limbo === inst) {
     cs.limbo = null;
     if (f.type === 'power') {
@@ -270,6 +272,9 @@ export function endTurn(run) {
   runHooks(ctx, 'turnEnd');
   statusPhase(ctx, cs.player, 'turnEnd');
   if (!ctx.over()) {
+    for (const e of ctx.enemiesAlive()) enemyDef(e.id).hooks?.playerTurnEnd?.(ctx.as(e), e);
+  }
+  if (!ctx.over()) {
     for (const inst of [...cs.piles.hand]) {
       cardDef(inst.id).inHandEnd?.(ctx.child({ card: inst, target: null }), inst);
       if (ctx.over()) break;
@@ -306,6 +311,7 @@ function enemyTurn(run, ctx) {
     if (m) {
       ctx.ev({ t: 'enemyMove', uid: e.uid, move: e.move, intent: m.intent });
       m.run(ctx.as(e), e, m);
+      if (!e.dead && !ctx.over()) def.after?.(ctx.as(e), e, m);
       e.hist.push(e.move);
       if (e.hist.length > 8) e.hist.shift();
     }
@@ -342,9 +348,9 @@ export function displayVals(run, inst, targetUid) {
   const cs = run?.combat;
   if (!cs || cs.phase === 'won' || cs.phase === 'lost') return { v, mods };
   if (costOf(inst, fi) === 'X') v.x = cs.player.energy;
-  f.calc?.(cs, v, inst);
   const p = cs.player;
   const tgt = targetUid ? cs.enemies.find((e) => e.uid === targetUid && !e.dead) : null;
+  f.calc?.(cs, v, inst, tgt);
   for (const k of Object.keys(v)) {
     if (typeof v[k] !== 'number') continue;
     let nv;

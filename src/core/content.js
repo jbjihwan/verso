@@ -8,6 +8,8 @@ import * as neutral from './data/cards/neutral.js';
 import { RELICS } from './data/relics.js';
 import { POTIONS } from './data/potions.js';
 import * as act1 from './data/enemies/act1.js';
+import * as act2 from './data/enemies/act2.js';
+import * as act3 from './data/enemies/act3.js';
 import { ENCOUNTERS } from './data/encounters.js';
 import { EVENTS } from './data/events.js';
 
@@ -58,7 +60,7 @@ for (const m of [basic, fool, magician, neutral]) {
 }
 registerRelics(RELICS);
 registerPotions(POTIONS);
-for (const m of [act1]) {
+for (const m of [act1, act2, act3]) {
   registerEnemies(m.ENEMIES);
   if (m.STATUSES) registerStatuses(m.STATUSES);
 }

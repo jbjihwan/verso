@@ -380,7 +380,7 @@ p { margin: 0; }
 .card.r-rare { --rim: var(--gold-deep); }
 .card.r-rare .card-inner::after { border-color: var(--gold); }
 .half {
-  position: absolute; left: 0; right: 0; height: 50%;
+  position: absolute; left: 0; right: 0; height: 50%; overflow: hidden;
   display: flex; flex-direction: column; gap: calc(var(--cw) * 0.02);
   padding: calc(var(--cw) * 0.05) calc(var(--cw) * 0.06) 0;
   transition: opacity var(--dur-short) var(--ease-out);
@@ -412,6 +412,9 @@ p { margin: 0; }
 .card.up .c-name { color: var(--upgraded); }
 .c-type { flex: none; width: calc(var(--cw) * 0.1); height: calc(var(--cw) * 0.1); color: var(--tc); }
 .c-text { font-size: calc(var(--cw) * 0.074); line-height: 1.28; text-align: center; }
+.c-text.long { font-size: calc(var(--cw) * 0.065); line-height: 1.24; }
+.c-text.xlong { font-size: calc(var(--cw) * 0.057); line-height: 1.2; }
+.c-text.long .c-onflip, .c-text.long .c-tags, .c-text.xlong .c-onflip, .c-text.xlong .c-tags { font-size: 0.92em; }
 .c-text .kw { color: var(--kw); }
 .c-text .n.up { color: var(--good-ink); }
 .c-text .n.down { color: var(--bad-ink); }
@@ -420,7 +423,7 @@ p { margin: 0; }
 .c-tags { font-weight: 700; letter-spacing: 0.02em; }
 .c-art {
   position: absolute; left: 50%; top: 50%;
-  width: calc(var(--cw) * 0.29); height: calc(var(--cw) * 0.29);
+  width: calc(var(--cw) * 0.22); height: calc(var(--cw) * 0.22);
   transform: translate(-50%, -50%); color: var(--card-ink);
 }
 .med-bg { fill: var(--med-bg); }
@@ -533,6 +536,24 @@ p { margin: 0; }
 .foe-svg .a { fill: var(--act-glow); stroke: var(--act-glow); stroke-linejoin: round; }
 .foe-svg .e { fill: var(--act-glow); }
 .foe-svg .m, .hero-svg .m { fill: var(--parchment-3); }
+.foe-svg .o { fill: none; stroke: var(--gold-deep); stroke-linecap: round; stroke-linejoin: round; }
+.foe-svg .w { fill: none; stroke: var(--ink-3); stroke-linecap: round; stroke-linejoin: round; }
+.foe-svg .al { fill: none; stroke: var(--act-glow); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.card.stuck .card-inner::before {
+  content: ''; position: absolute; inset: 3px; z-index: 2; pointer-events: none;
+  border: 3px dashed var(--venom); border-radius: calc(var(--cw) * 0.06);
+}
+.float.announce { font-size: 26px; color: var(--gold); letter-spacing: 0.04em; }
+.backdrop { position: absolute; left: 0; top: 0; pointer-events: none; opacity: 0.6; }
+.bd-ember { fill: var(--ember); animation: bd-rise var(--dur, 9s) var(--ease-in-out) var(--dl, 0s) infinite; }
+.bd-bubble { fill: none; stroke: var(--tide); stroke-width: 1.2; animation: bd-rise var(--dur, 9s) var(--ease-in-out) var(--dl, 0s) infinite; }
+.bd-shard {
+  fill: var(--glass); opacity: 0.25; transform-box: fill-box; transform-origin: center;
+  animation: bd-drift var(--dur, 9s) var(--ease-in-out) var(--dl, 0s) infinite alternate;
+}
+@keyframes bd-rise { 0% { transform: translateY(0); opacity: 0; } 25% { opacity: 0.85; } 100% { transform: translateY(-140px); opacity: 0; } }
+@keyframes bd-drift { from { transform: translate(0, 0) rotate(0deg); } to { transform: translate(16px, -12px) rotate(10deg); } }
+@media (prefers-reduced-motion: reduce) { .backdrop * { animation: none !important; } }
 .hero-svg .b { fill: var(--ink-4); stroke: var(--gold); stroke-width: 2.5; stroke-linejoin: round; }
 .hero-svg .d { fill: var(--ink-2); stroke: var(--gold-deep); stroke-width: 1.5; stroke-linejoin: round; }
 .hero-svg .k { fill: var(--parchment-2); stroke: var(--gold-deep); stroke-width: 2; }
@@ -869,6 +890,40 @@ p { margin: 0; }
 .cs-omen { display: flex; flex-direction: column; gap: 6px; }
 .cs-start { align-self: flex-start; min-width: 200px; margin-top: var(--space-2); }
 .insp-action { align-self: flex-start; }
+
+/* compendium · tutorial · card back */
+.screen-compendium {
+  display: flex; flex-direction: column; gap: var(--space-4); overflow-y: auto; touch-action: pan-y;
+  padding-inline: var(--space-6); padding-block: var(--space-5) var(--space-6);
+  background: radial-gradient(120% 90% at 50% 18%, var(--ink-2), var(--ink-0) 76%);
+}
+.cp-head { display: flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: var(--space-4); }
+.cp-head h1 { font-size: var(--text-2xl); }
+.cp-count { min-width: 90px; }
+.cp-relics { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--space-3); }
+.cp-relic {
+  display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: var(--space-3);
+  align-items: center; padding: var(--space-3); border: 1px solid var(--line-soft); border-radius: var(--radius-md);
+  background: var(--ink-1); color: var(--gold);
+}
+.cp-relic .rglyph { grid-row: span 2; }
+.cp-relic b { font-family: var(--font-display); color: var(--text); }
+.cp-relic span { font-size: var(--text-sm); }
+.cp-relic.unknown { color: var(--text-faint); }
+.cp-relic.unknown b { color: var(--text-faint); }
+.card.back { cursor: default; }
+.card.back .card-inner { background: var(--ink-2); border-color: var(--line); color: var(--gold-deep); }
+.card.back .card-inner::after { border-color: var(--line-soft); }
+.back-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.bk-frame, .bk-ring { fill: none; stroke: var(--gold-deep); stroke-width: 1; }
+.back-label { position: absolute; left: 6%; right: 6%; bottom: 9%; text-align: center; font-size: calc(var(--cw) * 0.075); color: var(--text-dim); }
+.tutorial { width: min(520px, calc(100% - 48px)); }
+.tut-list { margin: var(--space-4) 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-3); }
+.tut-list li { display: flex; align-items: flex-start; gap: var(--space-3); line-height: 1.5; }
+.tut-ico { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid var(--gold-deep); border-radius: 50%; color: var(--gold); font-size: 18px; }
+.potion-panel { width: min(400px, calc(100% - 48px)); display: flex; flex-direction: column; align-items: center; gap: var(--space-3); text-align: center; }
+.potion-panel .rglyph { color: var(--gold); }
+.potion-panel .panel-actions { justify-content: center; }
 
 /* ── Reduced motion ──────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {

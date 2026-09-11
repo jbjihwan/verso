@@ -4,18 +4,20 @@ import { h } from '../dom.js';
 import { app, persist, openOverlay, toast, motionScale } from '../app.js';
 import { stageInfo, toStage, stageRect } from '../stage.js';
 import { t, L } from '../../core/i18n.js';
-import { playCard, flipCard, endTurn, choose, canPlay, canFlip, intentView, isBusy } from '../../core/combat.js';
+import { playCard, flipCard, endTurn, choose, canPlay, canFlip, intentView, isBusy, usePotion } from '../../core/combat.js';
 import { faceOf } from '../../core/cards.js';
-import { enemyDef } from '../../core/content.js';
+import { enemyDef, potionDef } from '../../core/content.js';
 import { statusDef } from '../../core/statuses.js';
 import { KEYWORDS } from '../../core/keywords.js';
 import { cardEl, refreshCard } from '../cardview.js';
 import { enemyArt } from '../art/enemies.js';
 import { heroArt } from '../art/portraits.js';
+import { backdrop } from '../art/backgrounds.js';
 import { icon } from '../art/icons.js';
 import { mountHud } from '../hud.js';
 import { attachTip, hideTip } from '../tooltip.js';
 import { afterVictory, afterDefeat } from '../flow.js';
+import { markSeen } from '../../core/meta.js';
 import * as fx from '../fx.js';
 
 const ART = { sm: 120, md: 160, lg: 200, xl: 250 };
@@ -41,9 +43,16 @@ export function mount(root) {
   };
 
   root.classList.add(`act-${run.act}`);
+  for (const e of cs0.enemies) markSeen(app.meta, 'enemies', e.id);
 
   // ── 뼈대 ──────────────────────────────────────────────────────────────
-  const hud = mountHud(root, app, { onPotion: (slot) => openOverlay('potion', { slot, onUse: usePotionFromHud }) });
+  const hud = mountHud(root, app, {
+    onPotion: (slot) => openOverlay('potion', {
+      slot,
+      onUse: !S.busy && !S.ended && !run.combat.pending ? (s) => beginPotion(s) : null,
+      onChange: () => hud.update(),
+    }),
+  });
   const field = h('div', { class: 'field' });
   field.addEventListener('pointerdown', (e) => { if (e.target === field) deselect(); });
   const hero = buildHero();
@@ -74,6 +83,7 @@ export function mount(root) {
 
   const g0 = stageInfo();
   fx.bindCanvas(canvas, g0.w, g0.h);
+  field.prepend(backdrop(run.act, g0.w, g0.h));
 
   // ── 기하 ──────────────────────────────────────────────────────────────
   function geo() {
@@ -314,9 +324,11 @@ export function mount(root) {
     const e = findFoe(uid);
     const v = e && intentView(run, e);
     if (!v) return [];
-    const body = v.dmg != null
+    const m = enemyDef(e.id).moves[e.move];
+    const dmg = v.dmg != null
       ? (v.times > 1 ? t('intent.dmgTimes', { dmg: v.dmg, times: v.times }) : t('intent.dmg', { dmg: v.dmg }))
       : '';
+    const body = [dmg, m?.desc ? L(m.desc) : ''].filter(Boolean).join(' · ');
     return [{ title: t(`intent.${v.kind}`), body }];
   }
 
@@ -410,6 +422,7 @@ export function mount(root) {
     const p = run.combat.pending;
     let txt = '';
     if (p && p.kind === 'hand') txt = promptText(p);
+    else if (S.potionSlot != null) txt = t('combat.pickTarget');
     else if (S.sel && needsTarget(S.sel) && aliveFoes().length > 1 && !S.ended) txt = t('combat.pickTarget');
     promptEl.textContent = txt;
     promptEl.hidden = !txt;
@@ -551,6 +564,7 @@ export function mount(root) {
   function onFoeDown(ev, uid) {
     if (S.busy || S.ended) return;
     ev.stopPropagation();
+    if (S.potionSlot != null) { doPotion(S.potionSlot, uid); return; }
     if (S.sel && needsTarget(S.sel) && !S.pick) { doPlay(S.sel, uid); return; }
     S.kbTarget = uid;
     markTargets();
@@ -568,7 +582,8 @@ export function mount(root) {
 
   function deselect() {
     if (S.pick || S.busy) return;
-    if (!S.sel && !S.hot) return;
+    if (!S.sel && !S.hot && S.potionSlot == null) return;
+    S.potionSlot = null;
     S.sel = null;
     S.hot = null;
     refreshHand();
@@ -689,18 +704,36 @@ export function mount(root) {
     await playEvents(ev);
   }
 
-  async function usePotionFromHud(slot, targetUid, usePotion) {
-    if (S.busy || S.ended) return false;
-    const ev = usePotion(run, slot, targetUid ?? S.kbTarget ?? aliveFoes()[0]?.uid);
-    if (!ev.length) return false;
+  // 물약: 대상이 필요하고 적이 여럿이면 적을 누를 때까지 기다린다
+  function beginPotion(slot) {
+    const id = run.potions[slot];
+    if (!id || S.busy || S.ended) return;
+    const alive = aliveFoes();
+    if (potionDef(id).target === 'enemy' && alive.length > 1) {
+      S.sel = null;
+      S.potionSlot = slot;
+      refreshHand();
+      relayout();
+      updatePrompt();
+      for (const rec of S.foes.values()) rec.el.classList.add('targetable');
+      return;
+    }
+    doPotion(slot, alive[0]?.uid);
+  }
+
+  async function doPotion(slot, targetUid) {
+    S.potionSlot = null;
+    const ev = usePotion(run, slot, targetUid);
+    markTargets();
+    if (!ev.length) { updatePrompt(); return; }
     persist();
     await playEvents(ev);
-    return true;
   }
 
   // ── 연출 ──────────────────────────────────────────────────────────────
   async function banner(text, ms) {
     bannerEl.textContent = text;
+    bannerEl.style.animationDuration = `${Math.max(1, ms * motionScale())}ms`;
     bannerEl.hidden = false;
     fx.pulse(bannerEl, 'show', ms);
     await fx.wait(ms);
@@ -921,6 +954,17 @@ export function mount(root) {
       setTimeout(() => rec.el.classList.toggle('stance-1', ev.stance === 1), 260 * motionScale());
       await fx.wait(460);
     },
+    stuck: (ev) => {
+      const el = S.cards.get(ev.uid);
+      if (el) { el.classList.add('stuck'); fx.pulse(el, 'nope', 360); }
+    },
+    announce: async (ev) => {
+      const rec = S.foes.get(ev.uid);
+      if (!rec) return;
+      const c = artCenter(rec);
+      fx.floatText(fxLayer, c.x, c.y - 80, L(ev.text), 'announce');
+      await fx.wait(420);
+    },
     relic: (ev) => hud.flashRelic(ev.id),
     potion: async () => { hud.update(); await fx.wait(150); },
     handFull: () => toast(t('combat.handFull')),
@@ -1004,7 +1048,18 @@ export function mount(root) {
     syncAll({ skipHand: true });
     S.count.draw = cs0.piles.draw.length + initial.filter((e) => e.t === 'draw' && e.from !== 'other').length;
     updatePiles();
-    playEvents(initial).then(() => { if (S.alive && run.combat?.pending) enterPending(); });
+    (async () => {
+      if (run.fight?.kind === 'boss') {
+        const def = enemyDef(cs0.enemies[0].id);
+        await banner(`${def.numeral ? `${def.numeral} · ` : ''}${L(def.name)}`, 1400);
+      }
+      await playEvents(initial);
+      if (!S.alive) return;
+      if (run.combat?.pending) enterPending();
+      if (!app.meta.flags?.tutorial && !run.debug) {
+        openOverlay('tutorial', { onClose: () => { app.meta.flags.tutorial = true; persist(); } });
+      }
+    })();
   } else {
     syncAll();
     if (cs0.pending) enterPending();
