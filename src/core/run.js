@@ -446,6 +446,10 @@ function eventApi(run) {
     // { action: 'remove'|'upgrade'|'duplicate'|'transform'|'swap', count?, text? } — UI 가 카드를 고르게 한다
     select(spec) { run.pendingSelect = { count: 1, ...spec }; },
     fight(encId, reward = {}) { run.event.fight = { enc: encId, reward }; },
+    fightElite(reward = { relic: true }) {
+      const list = encountersFor(run.act, 'elite');
+      if (list.length) run.event.fight = { enc: pick(rng, list).id, reward };
+    },
   };
 }
 
@@ -463,6 +467,7 @@ export function chooseEvent(run, idx) {
 
 export function selectableFor(run, spec = run.pendingSelect) {
   if (!spec) return [];
+  if (spec.filter === 'curse') return run.deck.filter((c) => cardDef(c.id).pool === 'curse');
   if (spec.action === 'upgrade') return run.deck.filter(canUpgrade);
   if (spec.action === 'transform' || spec.action === 'remove') return run.deck.filter((c) => cardDef(c.id).rarity !== 'special' || cardDef(c.id).pool === 'curse');
   return run.deck.slice();
