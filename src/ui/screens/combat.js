@@ -19,6 +19,7 @@ import { attachTip, hideTip } from '../tooltip.js';
 import { afterVictory, afterDefeat } from '../flow.js';
 import { markSeen } from '../../core/meta.js';
 import * as fx from '../fx.js';
+import { sfx } from '../../audio/audio.js';
 
 const ART = { sm: 120, md: 160, lg: 200, xl: 250 };
 const INTENT_ICONS = {
@@ -665,6 +666,7 @@ export function mount(root) {
     if (!chk.ok) {
       const key = REASON[chk.reason];
       if (key) toast(t(key));
+      sfx('error');
       fx.pulse(S.cards.get(uid), 'nope', 360);
       relayout();
       return;
@@ -748,7 +750,7 @@ export function mount(root) {
 
   const H = {
     turn: async (ev) => {
-      if (ev.side === 'player') await banner(t('combat.yourTurn'), 620);
+      if (ev.side === 'player') { sfx('turn'); await banner(t('combat.yourTurn'), 620); }
       else await banner(t('combat.enemyTurn'), 480);
     },
     energy: (ev) => { setEnergy(ev.value, run.combat.player.maxEnergy); fx.pulse(orb, 'pop', 300); },
@@ -762,6 +764,7 @@ export function mount(root) {
       if (ev.from !== 'other') S.count.draw--;
       updatePiles();
       if (!S.shown.includes(ev.uid)) S.shown.push(ev.uid);
+      sfx('draw');
       relayout();
       await fx.wait(85);
     },
@@ -770,6 +773,7 @@ export function mount(root) {
       S.count.discard = 0;
       updatePiles();
       fx.pulse(piles.draw, 'pop', 400);
+      sfx('draw');
       await fx.wait(200);
     },
     play: async (ev) => {
@@ -779,6 +783,7 @@ export function mount(root) {
       S.limbo = ev.uid;
       el.classList.remove('sel', 'can', 'dragging');
       placeLimbo(el);
+      sfx('play');
       relayout();
       await fx.wait(210);
       if (ev.type === 'attack') fx.pulse(hero.body, 'lunge-r', 320);
@@ -789,6 +794,7 @@ export function mount(root) {
       const el = S.cards.get(ev.uid);
       if (!el) return;
       el.classList.toggle('rev', ev.rev);
+      sfx('flip');
       const r = stageRect(el);
       fx.burst('flip', r.cx, r.cy);
       await fx.wait(ev.manual ? 320 : 220);
@@ -866,11 +872,13 @@ export function mount(root) {
       }
       const c = artCenter(tgt);
       if (ev.loss > 0) {
+        sfx('hit', Math.min(1.6, 0.6 + ev.loss / 20));
         fx.floatText(fxLayer, c.x, c.y, String(ev.loss), 'dmg');
         fx.burst('hit', c.x, c.y);
         fx.pulse(tgt.body, 'hit', 300);
         fx.shake(tgt.body);
       } else if (ev.blocked > 0) {
+        sfx('block');
         fx.floatText(fxLayer, c.x, c.y, t('fx.blocked'), 'blk');
         fx.burst('block', c.x, c.y);
       }
@@ -882,6 +890,7 @@ export function mount(root) {
       const tgt = entRec(ev.target);
       if (!tgt) return;
       const c = artCenter(tgt);
+      sfx('venom');
       fx.floatText(fxLayer, c.x, c.y, String(ev.amount), 'venom');
       fx.pulse(tgt.body, 'hit', 300);
       tgt.hp.set(ev.hp, null, null);
@@ -892,6 +901,7 @@ export function mount(root) {
       const tgt = entRec(ev.target);
       if (!tgt) return;
       const c = artCenter(tgt);
+      sfx('heal');
       fx.floatText(fxLayer, c.x, c.y, `+${ev.amount}`, 'heal');
       fx.burst('heal', c.x, c.y);
       tgt.hp.set(ev.hp, ev.maxHp ?? null, null);
@@ -904,6 +914,7 @@ export function mount(root) {
       tgt.hp.set(null, null, ev.block);
       if (ev.reset) return;
       const c = artCenter(tgt);
+      sfx('block');
       fx.floatText(fxLayer, c.x, c.y - 20, `+${ev.amount}`, 'blk');
       await fx.wait(150);
     },
@@ -915,7 +926,11 @@ export function mount(root) {
       const passive = ev.target === 'player' ? null : enemyDef(findFoe(ev.target)?.id ?? '')?.passive;
       renderSts(tgt.sts, st, passive);
       if (ev.negated) { statusFloat(tgt, ev.target, 'ward', ''); await fx.wait(150); return; }
-      if (ev.delta > 0) { statusFloat(tgt, ev.target, ev.id, ev.delta); await fx.wait(140); }
+      if (ev.delta > 0) {
+        sfx(statusDef(ev.id).kind === 'debuff' ? 'debuff' : 'buff');
+        statusFloat(tgt, ev.target, ev.id, ev.delta);
+        await fx.wait(140);
+      }
     },
     enemyMove: async (ev) => {
       const rec = S.foes.get(ev.uid);
@@ -934,6 +949,7 @@ export function mount(root) {
       rec.dying = true;
       const c = artCenter(rec);
       fx.burst('death', c.x, c.y);
+      sfx('death');
       rec.el.classList.add('dying');
       setTimeout(() => { rec.el.remove(); S.foes.delete(ev.uid); if (S.alive) layoutFoes(); }, 650 * motionScale());
       await fx.wait(ev.fled ? 120 : 360);
@@ -965,17 +981,19 @@ export function mount(root) {
       fx.floatText(fxLayer, c.x, c.y - 80, L(ev.text), 'announce');
       await fx.wait(420);
     },
-    relic: (ev) => hud.flashRelic(ev.id),
+    relic: (ev) => { hud.flashRelic(ev.id); sfx('relic'); },
     potion: async () => { hud.update(); await fx.wait(150); },
     handFull: () => toast(t('combat.handFull')),
     victory: async () => {
       S.ended = true;
       for (const rec of S.foes.values()) rec.intent.hidden = true;
+      sfx('victory');
       await banner(t('combat.victory'), 900);
       if (S.alive) afterVictory(app);
     },
     defeat: async () => {
       S.ended = true;
+      sfx('defeat');
       await fx.wait(400);
       showDefeat();
     },
@@ -1051,6 +1069,7 @@ export function mount(root) {
     (async () => {
       if (run.fight?.kind === 'boss') {
         const def = enemyDef(cs0.enemies[0].id);
+        sfx('boss');
         await banner(`${def.numeral ? `${def.numeral} · ` : ''}${L(def.name)}`, 1400);
       }
       await playEvents(initial);

@@ -11,6 +11,8 @@ import { glyph } from '../art/glyphs.js';
 import { icon } from '../art/icons.js';
 import { attachTip } from '../tooltip.js';
 import { leave } from '../flow.js';
+import { markSeen } from '../../core/meta.js';
+import { sfx } from '../../audio/audio.js';
 
 export function mount(root) {
   const run = app.run;
@@ -35,7 +37,7 @@ export function mount(root) {
 
   function draw() {
     list.replaceChildren();
-    if (!r.goldTaken) list.append(item(icon('coin'), t('reward.gold', { n: r.gold }), () => { takeGold(run); redraw(); }));
+    if (!r.goldTaken) list.append(item(icon('coin'), t('reward.gold', { n: r.gold }), () => { takeGold(run); sfx('gold'); redraw(); }));
     if (!r.potionTaken) {
       const p = potionDef(r.potion);
       list.append(item(glyph(p.art ?? 'drop', 'rglyph'), L(p.name),
@@ -44,9 +46,11 @@ export function mount(root) {
     }
     if (!r.relicTaken) {
       const rd = relicDef(r.relic);
-      list.append(item(glyph(rd.art ?? 'star', 'rglyph'), L(rd.name), () => { takeRelic(run); redraw(); }, () => relicTip(r.relic)));
+      list.append(item(glyph(rd.art ?? 'star', 'rglyph'), L(rd.name), () => { takeRelic(run); sfx('relic'); redraw(); }, () => relicTip(r.relic)));
     }
     cards.replaceChildren();
+    for (const c of r.cards) markSeen(app.meta, 'cards', c.id);
+    if (r.relic) markSeen(app.meta, 'relics', r.relic);
     if (!r.cardsDone && r.cards.length) {
       const row = h('div', { class: 'rw-cardrow' });
       r.cards.forEach((c, i) => {

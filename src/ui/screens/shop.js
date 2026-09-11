@@ -11,6 +11,8 @@ import { glyph } from '../art/glyphs.js';
 import { icon } from '../art/icons.js';
 import { attachTip } from '../tooltip.js';
 import { leave } from '../flow.js';
+import { markSeen } from '../../core/meta.js';
+import { sfx } from '../../audio/audio.js';
 
 const REASON = { poor: 'shop.poor', potionsFull: 'shop.potionsFull', sold: 'shop.sold' };
 
@@ -25,7 +27,8 @@ export function mount(root) {
   const refresh = () => { persist(); hud.update(); draw(); };
   const tryBuy = (kind, i) => {
     const res = buy(run, kind, i);
-    if (!res.ok) { toast(t(REASON[res.reason] ?? 'shop.sold')); return; }
+    if (!res.ok) { toast(t(REASON[res.reason] ?? 'shop.sold')); sfx('error'); return; }
+    sfx('gold');
     refresh();
   };
   const tag = (price, sale) => h('span', { class: `price num${run.gold < price ? ' poor' : ''}${sale ? ' sale' : ''}` }, icon('coin'), String(price));
@@ -33,6 +36,8 @@ export function mount(root) {
 
   function draw() {
     const s = run.shop;
+    for (const it of [...s.cards, ...s.neutral]) markSeen(app.meta, 'cards', it.id);
+    for (const it of s.relics) markSeen(app.meta, 'relics', it.id);
     const cards = h('div', { class: 'shop-cards' });
     for (const [kind, list] of [['cards', s.cards], ['neutral', s.neutral]]) {
       list.forEach((it, i) => {

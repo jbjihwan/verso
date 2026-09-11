@@ -7,6 +7,7 @@ import { initStage, onStageChange } from './stage.js';
 import { makeStore, loadAll, saveRun, saveMeta, saveSettings, KEYS } from '../core/save.js';
 import { detectLang, setLang, getLang, t } from '../core/i18n.js';
 import { defaultMeta } from '../core/meta.js';
+import { unlockAudio, setVolumes, playMusic, suspendAudio, sfx } from '../audio/audio.js';
 
 export const app = {
   stage: null,
@@ -56,8 +57,15 @@ export function startApp(stage) {
   initStage(stage);
   onStageChange(() => { render(); remountOverlays(); });
   window.addEventListener('keydown', onKey);
-  document.addEventListener('visibilitychange', () => { if (document.hidden) flush(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) flush();
+    suspendAudio(document.hidden);
+  });
   window.addEventListener('pagehide', flush);
+  // 오디오는 첫 입력 이후에만 열 수 있다. 버튼을 누르면 짧은 딸깍 소리.
+  window.addEventListener('pointerdown', unlockAudio);
+  window.addEventListener('keydown', unlockAudio);
+  stage.addEventListener('click', (e) => { if (e.target.closest?.('button:not(:disabled)')) sfx('click'); });
 
   render();
   for (const n of loaded.notices) toast(t(`notice.${n}`), 'warn');
@@ -79,6 +87,14 @@ export function render() {
   const root = h('div', { class: `screen screen-${name}` });
   layers.screen.append(root);
   current = { name, handle: mod.mount(root, app) ?? {} };
+  playMusic(musicFor(name));
+}
+
+function musicFor(name) {
+  if (!app.run || app.menu) return 'title';
+  if (name === 'result') return 'title';
+  if (name === 'combat' && app.run.fight?.kind === 'boss') return 'boss';
+  return `act${Math.min(3, app.run.act)}`;
 }
 
 export function goMenu(name, arg = null) {
@@ -216,6 +232,7 @@ function applySettings() {
   document.documentElement.lang = getLang();
   app.stage?.classList.toggle('fast', !!app.settings.fast);
   app.stage?.classList.toggle('noshake', !app.settings.shake);
+  setVolumes(app.settings.sfx, app.settings.music);
   for (const fn of settingsListeners) fn(app.settings);
 }
 

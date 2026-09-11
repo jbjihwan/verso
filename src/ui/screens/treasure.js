@@ -9,6 +9,7 @@ import { glyph } from '../art/glyphs.js';
 import { icon } from '../art/icons.js';
 import { attachTip } from '../tooltip.js';
 import { leave } from '../flow.js';
+import { sfx } from '../../audio/audio.js';
 
 export function mount(root) {
   const run = app.run;
@@ -32,7 +33,7 @@ export function mount(root) {
       tr.opened ? h('div', { class: 'loot' }, h('p', { class: 'loot-line' }, icon('coin'), t('reward.gold', { n: tr.gold })), relicLine) : null,
       h('div', { class: 'room-actions' }, tr.opened
         ? h('button', { class: 'btn primary', onClick: () => leave() }, t('common.continue'))
-        : h('button', { class: 'btn primary', onClick: () => { openTreasure(run); persist(); hud.update(); draw(); } }, t('treasure.open'))));
+        : h('button', { class: 'btn primary', onClick: () => { openTreasure(run); sfx('relic'); persist(); hud.update(); draw(); } }, t('treasure.open'))));
   }
   draw();
   return {};
