@@ -50,7 +50,7 @@ export function mount(root) {
   const hud = mountHud(root, app, {
     onPotion: (slot) => openOverlay('potion', {
       slot,
-      onUse: !S.busy && !S.ended && !run.combat.pending ? (s) => beginPotion(s) : null,
+      onUse: !S.busy && !S.ended && !run.combat?.pending ? (s) => beginPotion(s) : null,
       onChange: () => hud.update(),
     }),
   });
@@ -432,7 +432,7 @@ export function mount(root) {
   function promptText(p) { return t(`prompt.${p?.prompt ?? 'pick'}`); }
 
   function updatePrompt() {
-    const p = run.combat.pending;
+    const p = run.combat?.pending;
     let txt = '';
     if (p && p.kind === 'hand') txt = promptText(p);
     else if (S.potionSlot != null) txt = t('combat.pickTarget');
@@ -628,7 +628,7 @@ export function mount(root) {
 
   // ── 선택(pending) ─────────────────────────────────────────────────────
   function enterPending() {
-    const p = run.combat.pending;
+    const p = run.combat?.pending;
     if (!p) return;
     S.sel = null;
     if (p.kind === 'hand') {
@@ -647,7 +647,7 @@ export function mount(root) {
   }
 
   function togglePick(uid) {
-    const p = run.combat.pending;
+    const p = run.combat?.pending;
     if (!p || !p.options.includes(uid)) return;
     if (p.count === 1 && p.min === 1) { doChoose([uid]); return; }
     if (S.pick.set.has(uid)) S.pick.set.delete(uid);
@@ -656,7 +656,7 @@ export function mount(root) {
   }
 
   function confirmPick() {
-    const p = run.combat.pending;
+    const p = run.combat?.pending;
     if (!p || !S.pick || S.pick.set.size < p.min) return;
     doChoose([...S.pick.set]);
   }
@@ -665,10 +665,11 @@ export function mount(root) {
     S.pick = null;
     confirmBtn.hidden = true;
     const ev = choose(run, ids);
-    if (!ev.length && run.combat.pending) { enterPending(); return; }
+    if (!ev.length && run.combat?.pending) { enterPending(); return; }
     persist();
     await playEvents(ev);
-    if (run.combat.pending) enterPending();
+    if (!S.alive) return;   // 연출 도중 전투가 끝나 화면이 바뀌었을 수 있다
+    if (run.combat?.pending) enterPending();
   }
 
   // ── 행동 ──────────────────────────────────────────────────────────────
@@ -691,7 +692,8 @@ export function mount(root) {
     if (!ev.length) { relayout(); return; }
     persist();
     await playEvents(ev);
-    if (run.combat.pending) enterPending();
+    if (!S.alive) return;   // 연출 도중 전투가 끝나 화면이 바뀌었을 수 있다
+    if (run.combat?.pending) enterPending();
   }
 
   async function doFlip(uid) {
