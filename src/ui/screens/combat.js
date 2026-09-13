@@ -105,10 +105,10 @@ export function mount(root) {
     const ctrlTop = handTop - 82;
     const heroArt = H < 1000 ? 96 : 116;
     const heroBase = ctrlTop - 72;
-    const foeBase = Math.round(Math.min(Math.max(H * 0.37, 300), 470, heroBase - heroArt - 86));
+    const foeBase = Math.round(Math.min(Math.max(H * 0.42, 320), 520, heroBase - heroArt - 86));
     return {
       W, H, portrait, cw, ch,
-      handCx: W / 2, handY: H - ch / 2 - 12, handMaxW: W - 24,
+      handCx: W / 2, handY: H - ch / 2 - 20, handMaxW: W - 24,
       playX: W / 2, playY: Math.round((foeBase + 80 + heroBase - heroArt) / 2),
       foeBase, foeL: 10, foeR: W - 10,
       heroX: 88, heroBase, heroArt,
