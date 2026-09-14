@@ -315,7 +315,7 @@ p { margin: 0; }
 .hud-stat.gold .ico { color: var(--gold); }
 .hud-potions { display: flex; gap: 6px; }
 .pslot {
-  width: 34px; height: 34px; padding: 0; display: grid; place-items: center;
+  width: 44px; height: 44px; padding: 0; display: grid; place-items: center;
   border: 1px dashed var(--line); border-radius: 50%; background: none; color: var(--text-faint); cursor: default;
 }
 .pslot.full { border-style: solid; border-color: var(--gold-deep); color: var(--gold); cursor: pointer; }
@@ -335,13 +335,13 @@ p { margin: 0; }
 .hud-spacer { flex: 1; }
 .hud-where { font-family: var(--font-display); color: var(--text-dim); white-space: nowrap; }
 .hud-btn {
-  display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px;
+  display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 12px;
   border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--ink-2);
   white-space: nowrap; cursor: pointer; transition: border-color var(--dur-short) var(--ease-out);
 }
 .hud-btn:hover { border-color: var(--gold-deep); }
 .hud-btn .ico { font-size: 20px; }
-.hud-btn.icon-only { width: 38px; padding: 0; justify-content: center; }
+.hud-btn.icon-only { width: 44px; padding: 0; justify-content: center; }
 .portrait .hud { height: 64px; gap: var(--space-3); }
 .portrait .hud-name { display: none; }
 .portrait .hud-relics { position: absolute; left: var(--space-4); top: 70px; }
